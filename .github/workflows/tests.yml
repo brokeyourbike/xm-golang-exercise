@@ -40,5 +40,5 @@ jobs:
         CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_TOKEN }}
       with:
         coverageCommand: ''
-        prefix: 'github.com/brokeyourbike/nickroservices'
+        prefix: 'github.com/brokeyourbike/xm-golang-exercise'
         coverageLocations: ./coverage.out:gocov
