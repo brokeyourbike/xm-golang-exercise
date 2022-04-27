@@ -20,6 +20,13 @@ jobs:
       with:
         go-version: 1.17
 
+    - uses: brokeyourbike/go-mockery-action@v0.1.1
+      with:
+        mockery-version: '2.12.1'
+
+    - name: Generate mocks using mockery
+      run: mockery --all
+
     - name: Build
       run: go build -v ./...
 
