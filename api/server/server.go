@@ -20,42 +20,39 @@ type Middleware interface {
 }
 
 type server struct {
+	router    *chi.Mux
 	companies CompaniesHandler
 	cmw       Middleware
 	pmw       Middleware
 	ipmw      Middleware
 }
 
-func NewServer(c CompaniesHandler, cmw Middleware, pmw Middleware, ipmw Middleware) *server {
-	s := server{companies: c, cmw: cmw, pmw: pmw, ipmw: ipmw}
+func NewServer(r *chi.Mux, c CompaniesHandler, cmw Middleware, pmw Middleware, ipmw Middleware) *server {
+	s := server{router: r, companies: c, cmw: cmw, pmw: pmw, ipmw: ipmw}
 	return &s
 }
 
-func (s *server) CreateCompany(w http.ResponseWriter, r *http.Request) {
-	s.companies.HandleCompanyCreate(w, r)
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.routes()
+	s.router.ServeHTTP(w, r)
 }
 
-func (s *server) UpdateCompany(w http.ResponseWriter, r *http.Request) {
-	s.companies.HandleCompanyUpdate(w, r)
+func (s *server) Handle(config *configs.Config) {
+	s.routes()
+	http.ListenAndServe(config.Host+":"+config.Port, s.router)
 }
 
-func (s *server) DeleteCompany(w http.ResponseWriter, r *http.Request) {
-	s.companies.HandleCompanyDelete(w, r)
-}
+func (s *server) routes() {
+	s.router.Use(middleware.RealIP)
+	s.router.Use(middleware.Recoverer)
+	s.router.Use(render.SetContentType(render.ContentTypeJSON))
 
-func (s *server) Handle(config *configs.Config, router *chi.Mux) {
-	router.Use(middleware.RealIP)
-	router.Use(middleware.Recoverer)
-	router.Use(render.SetContentType(render.ContentTypeJSON))
-
-	router.Route("/companies", func(r chi.Router) {
-		r.With(s.ipmw.Handle, s.pmw.Handle).Post("/", s.CreateCompany)
+	s.router.Route("/companies", func(r chi.Router) {
+		r.With(s.ipmw.Handle, s.pmw.Handle).Post("/", s.companies.HandleCompanyCreate)
 		r.Route("/{id:[0-9]+}", func(r chi.Router) {
 			r.Use(s.cmw.Handle)
-			r.With(s.pmw.Handle).Put("/", s.UpdateCompany)
-			r.Delete("/", s.DeleteCompany)
+			r.With(s.pmw.Handle).Put("/", s.companies.HandleCompanyUpdate)
+			r.Delete("/", s.companies.HandleCompanyDelete)
 		})
 	})
-
-	http.ListenAndServe(config.Host+":"+config.Port, router)
 }

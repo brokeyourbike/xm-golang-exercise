@@ -46,8 +46,8 @@ func run() error {
 	pmw := middlewares.NewCompanyPayloadCtx()
 	ipmw := middlewares.NewIpapi(&cfg)
 
-	srv := server.NewServer(c, cmw, pmw, ipmw)
-	srv.Handle(&cfg, chi.NewRouter())
+	srv := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
+	srv.Handle(&cfg)
 
 	return nil
 }
