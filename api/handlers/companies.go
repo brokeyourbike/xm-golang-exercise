@@ -15,7 +15,7 @@ type CompanyCtxKey struct{}
 // CompanyPayloadCtxKey is a key used for the Company payload object in the context
 type CompanyPayloadCtxKey struct{}
 
-// CompaniesRepo repository defines functions used companies manipulation.
+// CompaniesRepo repository defines functions used for companies manipulation.
 type CompaniesRepo interface {
 	Create(models.Company) (models.Company, error)
 	GetAll(requests.CompanyPayload) ([]models.Company, error)

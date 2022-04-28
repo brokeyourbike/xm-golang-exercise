@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// CompaniesRepo allows to store and retrieve companies from the database.
 type CompaniesRepo struct {
 	db *gorm.DB
 }
