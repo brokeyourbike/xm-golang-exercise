@@ -11,14 +11,14 @@ import (
 	"github.com/go-chi/render"
 )
 
+// CompanyPayloadCtx is used to validate incoming Company payload data.
+// In case payload is invalid, we return formatted errors.
 type CompanyPayloadCtx struct{}
 
 func NewCompanyPayloadCtx() *CompanyPayloadCtx {
 	return &CompanyPayloadCtx{}
 }
 
-// CompanyPayloadCtx is used to validate incoming Company payload data.
-// In case payload is invalid, we return formatted errors.
 func (c *CompanyPayloadCtx) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data models.Company

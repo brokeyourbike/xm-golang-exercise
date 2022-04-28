@@ -36,8 +36,6 @@ func TestCompanyPayloadCtx(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			mw := NewCompanyPayloadCtx()
 			h := mw.Handle(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("the end."))

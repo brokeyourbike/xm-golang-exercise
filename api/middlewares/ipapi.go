@@ -5,23 +5,32 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/brokeyourbike/xm-golang-exercise/configs"
-	"github.com/coocood/freecache"
 	log "github.com/sirupsen/logrus"
 )
 
+type HTTPClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
+type Cache interface {
+	Get([]byte) ([]byte, error)
+	Set([]byte, []byte, int) error
+}
+
+// Ipapi is a middleware that fetched the country code for request remote address,
+// and verifies if it's allowed to proceed.
 type Ipapi struct {
-	config *configs.Config
-	cache  *freecache.Cache
+	config     *configs.Config
+	httpClient HTTPClient
+	cache      Cache
 }
 
-func NewIpapi(config *configs.Config, cache *freecache.Cache) *Ipapi {
-	return &Ipapi{config: config, cache: cache}
+func NewIpapi(config *configs.Config, httpClient HTTPClient, cache Cache) *Ipapi {
+	return &Ipapi{config: config, httpClient: httpClient, cache: cache}
 }
 
-// Ipapi is a middleware that logs the start and end of each request.
 func (i *Ipapi) Handle(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		parts := strings.Split(r.RemoteAddr, ":")
@@ -64,8 +73,6 @@ func (i *Ipapi) getCountryCode(ip string) (string, error) {
 }
 
 func (i *Ipapi) fetchCountryCode(ip string) (string, error) {
-	c := http.Client{Timeout: time.Second * time.Duration(i.config.Ipapi.TimeoutSeconds)}
-
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/country", i.config.Ipapi.BaseURL, ip), nil)
 	if err != nil {
 		return "", err
@@ -73,7 +80,7 @@ func (i *Ipapi) fetchCountryCode(ip string) (string, error) {
 
 	req.Header.Set("User-Agent", "xm-golang-exercise/0.0.0")
 
-	resp, err := c.Do(req)
+	resp, err := i.httpClient.Do(req)
 	if err != nil {
 		return "", err
 	}

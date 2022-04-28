@@ -13,6 +13,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// CompanyCtx is used to load an Company object from
+// the URL parameters passed through as the request. In case
+// the Company could not be found, we stop here and return a 404.
 type CompanyCtx struct {
 	companiesRepo handlers.CompaniesRepo
 }
@@ -21,9 +24,6 @@ func NewCompanyCtx(r handlers.CompaniesRepo) *CompanyCtx {
 	return &CompanyCtx{companiesRepo: r}
 }
 
-// CompanyCtx is used to load an Company object from
-// the URL parameters passed through as the request. In case
-// the Company could not be found, we stop here and return a 404.
 func (c *CompanyCtx) Handle(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 0)

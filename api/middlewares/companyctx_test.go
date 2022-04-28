@@ -56,8 +56,6 @@ func TestCompanyCtx(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			companiesRepo := new(mocks.CompaniesRepo)
 			c.setupMock(companiesRepo)
 

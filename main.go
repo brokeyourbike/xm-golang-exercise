@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/brokeyourbike/xm-golang-exercise/api/handlers"
 	"github.com/brokeyourbike/xm-golang-exercise/api/middlewares"
@@ -40,6 +42,7 @@ func run() error {
 	}
 
 	cache := freecache.NewCache(cfg.CacheSizeMb * 1024 * 1024)
+	httpClient := http.Client{Timeout: time.Second * time.Duration(cfg.Ipapi.TimeoutSeconds)}
 
 	orm.AutoMigrate(&models.Company{})
 	companiesRepo := db.NewCompaniesRepo(orm)
@@ -47,7 +50,7 @@ func run() error {
 	c := handlers.NewCompanies(companiesRepo)
 	cmw := middlewares.NewCompanyCtx(companiesRepo)
 	pmw := middlewares.NewCompanyPayloadCtx()
-	ipmw := middlewares.NewIpapi(&cfg, cache)
+	ipmw := middlewares.NewIpapi(&cfg, &httpClient, cache)
 
 	srv := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
 	srv.Handle(&cfg)
