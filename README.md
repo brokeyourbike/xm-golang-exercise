@@ -6,3 +6,22 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/314c92377d5671930b71/test_coverage)](https://codeclimate.com/github/brokeyourbike/xm-golang-exercise/test_coverage)
 
 XM Golang Exercise - v21.0.0
+
+## How to run
+
+```bash
+go run main.go
+```
+
+## Configuration
+
+| Enviroment Variable | Description | Default  |
+| ------------- |:-------------:| -----:|
+| `HOST` | application host | `127.0.0.1` |
+| `PORT` | application port |   `9090` |
+| `DATABASE_DSN` | MySQL database DSN (data shource name) | `username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=True&loc=Local` |
+| `CACHE_SIZE_MB` | applicaiton cache size, in MB | `100` |
+| `IPAPI_BASE_URL` | base URL for the [ipapi.co](https://ipapi.co) service | `https://ipapi.co` |
+| `IPAPI_TTL_SECONDS` | how long to cache information about IP address, in seconds | `10` |
+| `IPAPI_TIMEOUT_SECONDS` | HTTP client timeout, in seconds | `10` |
+| `IPAPI_ALLOWED_COUNTRIES` | list of allowed countries (comma separated) | `CY` |
