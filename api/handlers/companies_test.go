@@ -104,7 +104,7 @@ func TestCompanies(t *testing.T) {
 			response:   `{"message":"Cannot update company"}`,
 			setupCtx: func(req *http.Request) context.Context {
 				company := models.Company{ID: 30}
-				data := models.Company{}
+				data := requests.CompanyPayload{}
 
 				ctx := context.WithValue(req.Context(), CompanyCtxKey{}, company)
 				return context.WithValue(ctx, CompanyPayloadCtxKey{}, data)
@@ -120,7 +120,7 @@ func TestCompanies(t *testing.T) {
 			response:   `{"id":30,"name":"after","code":"a123","country":"AU","website":"after.com","phone":"+56789"}`,
 			setupCtx: func(req *http.Request) context.Context {
 				company := models.Company{ID: 30, Name: "before", Code: "b123", Country: "BE", Website: "before.com", Phone: "+1234"}
-				data := models.Company{Name: "after", Code: "a123", Country: "AU", Website: "after.com", Phone: "+56789"}
+				data := requests.CompanyPayload{Name: "after", Code: "a123", Country: "AU", Website: "after.com", Phone: "+56789"}
 
 				ctx := context.WithValue(req.Context(), CompanyCtxKey{}, company)
 				return context.WithValue(ctx, CompanyPayloadCtxKey{}, data)
