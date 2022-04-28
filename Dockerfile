@@ -13,7 +13,7 @@ RUN go build -o app
 ##
 FROM gcr.io/distroless/base
 WORKDIR /
-COPY --from=build /app /bin/app
-EXPOSE "$PORT"
+COPY --from=build /build/app /bin/app
+EXPOSE 9090
 USER nonroot:nonroot
 ENTRYPOINT ["/bin/app"]
