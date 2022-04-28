@@ -45,6 +45,33 @@ func TestCompanies(t *testing.T) {
 			},
 			setupMock: func(companiesRepo *mocks.CompaniesRepo) {},
 		},
+		"view companies": {
+			method:     http.MethodGet,
+			path:       "/companies",
+			statusCode: http.StatusOK,
+			response:   `{"companies":[{"id":1,"name":"john","code":"","country":"","website":"","phone":""}]}`,
+			setupCtx: func(req *http.Request) context.Context {
+				data := requests.CompanyPayload{}
+				return context.WithValue(req.Context(), CompanyPayloadCtxKey{}, data)
+			},
+			setupMock: func(companiesRepo *mocks.CompaniesRepo) {
+				companies := []models.Company{{ID: 1, Name: "john"}}
+				companiesRepo.On("GetAll", mock.AnythingOfType("CompanyPayload")).Return(companies, nil)
+			},
+		},
+		"cannot view companies": {
+			method:     http.MethodGet,
+			path:       "/companies",
+			statusCode: http.StatusInternalServerError,
+			response:   `{"message":"Cannot retrieve companies"}`,
+			setupCtx: func(req *http.Request) context.Context {
+				data := requests.CompanyPayload{}
+				return context.WithValue(req.Context(), CompanyPayloadCtxKey{}, data)
+			},
+			setupMock: func(companiesRepo *mocks.CompaniesRepo) {
+				companiesRepo.On("GetAll", mock.AnythingOfType("CompanyPayload")).Return([]models.Company{}, errors.New("cannot fetch companies"))
+			},
+		},
 		"create company": {
 			method:     http.MethodPost,
 			path:       "/companies",
