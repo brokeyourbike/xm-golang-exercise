@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -63,7 +64,7 @@ func (s *CompaniesSuite) TestItCanCreateCompany() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec("INSERT INTO `companies`").
+	s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `companies`")).
 		WithArgs(company.Name, company.Code, company.Country, company.Website, company.Phone).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
@@ -83,7 +84,7 @@ func (s *CompaniesSuite) TestItCanGetCompanyById() {
 		Phone:   "+12345",
 	}
 
-	s.mock.ExpectQuery("SELECT").
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `companies`")).
 		WithArgs(company.ID).
 		WillReturnRows((sqlmock.NewRows([]string{"id", "name", "code", "country", "website", "phone"})).
 			AddRow("3", "test", "c12", "UA", "test.com", "+12345"))
@@ -94,7 +95,7 @@ func (s *CompaniesSuite) TestItCanGetCompanyById() {
 }
 
 func (s *CompaniesSuite) TestItCanReturnErrCompanyNotFound() {
-	s.mock.ExpectQuery("SELECT").
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `companies`")).
 		WithArgs(10).
 		WillReturnError(gorm.ErrRecordNotFound)
 
@@ -104,11 +105,42 @@ func (s *CompaniesSuite) TestItCanReturnErrCompanyNotFound() {
 }
 
 func (s *CompaniesSuite) TestItCanReturnGeneralError() {
-	s.mock.ExpectQuery("SELECT").
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `companies`")).
 		WithArgs(10).
 		WillReturnError(gorm.ErrInvalidField)
 
 	res, err := s.repository.Get(10)
 	assert.ErrorIs(s.T(), err, gorm.ErrInvalidField)
 	assert.Equal(s.T(), models.Company{}, res)
+}
+
+func (s *CompaniesSuite) TestItCanDeleteCompany() {
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `companies`")).
+		WithArgs(10).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectCommit()
+
+	err := s.repository.Delete(10)
+	assert.NoError(s.T(), err)
+}
+
+func (s *CompaniesSuite) TestItCanUpdateCompany() {
+	company := models.Company{
+		ID:      3,
+		Name:    "test",
+		Code:    "c12",
+		Country: "UA",
+		Website: "test.com",
+		Phone:   "+12345",
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta("UPDATE `companies`")).
+		WithArgs(company.Name, company.Code, company.Country, company.Website, company.Phone, company.ID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectCommit()
+
+	err := s.repository.Update(company)
+	assert.NoError(s.T(), err)
 }
