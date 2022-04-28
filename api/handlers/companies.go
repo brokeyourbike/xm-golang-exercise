@@ -13,6 +13,29 @@ type CompanyCtxKey struct{}
 // CompanyPayloadCtxKey is a key used for the Company payload object in the context
 type CompanyPayloadCtxKey struct{}
 
+// ErrResponse renderer type for handling all sorts of errors.
+type ErrResponse struct {
+	HTTPStatusCode int      `json:"-"`                // http response status code
+	Message        string   `json:"message"`          // user-level status message
+	Errors         []string `json:"errors,omitempty"` // application-level errors
+}
+
+func (e ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, e.HTTPStatusCode)
+	return nil
+}
+
+// CompanyResponse is the response for the Company data model.
+type CompanyResponse struct {
+	*models.Company
+	HTTPStatusCode int `json:"-"`
+}
+
+func (c CompanyResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, c.HTTPStatusCode)
+	return nil
+}
+
 type CompaniesRepo interface {
 	Create(company models.Company) (models.Company, error)
 	Get(id uint64) (models.Company, error)
@@ -38,7 +61,19 @@ func (c *companies) HandleCompanyCreate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	render.Render(w, r, &Payload{Company: &company, HTTPStatusCode: http.StatusCreated})
+	render.Render(w, r, &CompanyResponse{Company: &company, HTTPStatusCode: http.StatusCreated})
+}
+
+// HandleCompanyGetOne handles GET requests to view Company
+func (c *companies) HandleCompanyGetOne(w http.ResponseWriter, r *http.Request) {
+	company := r.Context().Value(CompanyCtxKey{}).(models.Company)
+
+	render.Render(w, r, &CompanyResponse{Company: &company, HTTPStatusCode: http.StatusOK})
+}
+
+// HandleCompanyGetAll handles GET requests to view all companies
+func (c *companies) HandleCompanyGetAll(w http.ResponseWriter, r *http.Request) {
+	// TODO: implement
 }
 
 // HandleCompanyUpdate handles PUT requests to update companies
@@ -52,7 +87,7 @@ func (c *companies) HandleCompanyUpdate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	render.Render(w, r, &Payload{Company: &data, HTTPStatusCode: http.StatusCreated})
+	render.Render(w, r, &CompanyResponse{Company: &data, HTTPStatusCode: http.StatusCreated})
 }
 
 // HandleCompanyDelete handles DELETE requests to delete companies

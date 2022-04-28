@@ -11,6 +11,8 @@ import (
 
 type CompaniesHandler interface {
 	HandleCompanyCreate(w http.ResponseWriter, r *http.Request)
+	HandleCompanyGetOne(w http.ResponseWriter, r *http.Request)
+	HandleCompanyGetAll(w http.ResponseWriter, r *http.Request)
 	HandleCompanyUpdate(w http.ResponseWriter, r *http.Request)
 	HandleCompanyDelete(w http.ResponseWriter, r *http.Request)
 }
@@ -51,6 +53,7 @@ func (s *server) routes() {
 		r.With(s.ipmw.Handle, s.pmw.Handle).Post("/", s.companies.HandleCompanyCreate)
 		r.Route("/{id:[0-9]+}", func(r chi.Router) {
 			r.Use(s.cmw.Handle)
+			r.Get("/", s.companies.HandleCompanyGetOne)
 			r.With(s.pmw.Handle).Put("/", s.companies.HandleCompanyUpdate)
 			r.Delete("/", s.companies.HandleCompanyDelete)
 		})
