@@ -12,6 +12,7 @@ import (
 	"github.com/brokeyourbike/xm-golang-exercise/configs"
 	"github.com/brokeyourbike/xm-golang-exercise/db"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
+	"github.com/brokeyourbike/xm-golang-exercise/pkg/validator"
 	"github.com/caarlos0/env/v6"
 	"github.com/coocood/freecache"
 	"github.com/go-chi/chi/v5"
@@ -49,7 +50,7 @@ func run() error {
 
 	c := handlers.NewCompanies(companiesRepo)
 	cmw := middlewares.NewCompanyCtx(companiesRepo)
-	pmw := middlewares.NewCompanyPayloadCtx()
+	pmw := middlewares.NewCompanyPayloadCtx(validator.NewValidation())
 	ipmw := middlewares.NewIpapi(&cfg, &httpClient, cache)
 
 	srv := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)

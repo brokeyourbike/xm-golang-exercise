@@ -8,6 +8,7 @@ import (
 
 	"github.com/brokeyourbike/xm-golang-exercise/api/handlers"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
+	"github.com/brokeyourbike/xm-golang-exercise/pkg/validator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +37,7 @@ func TestCompanyPayloadCtx(t *testing.T) {
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			mw := NewCompanyPayloadCtx()
+			mw := NewCompanyPayloadCtx(validator.NewValidation())
 			h := mw.Handle(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("the end."))
 				w.WriteHeader(http.StatusOK)

@@ -13,10 +13,12 @@ import (
 
 // CompanyPayloadCtx is used to validate incoming Company payload data.
 // In case payload is invalid, we return formatted errors.
-type CompanyPayloadCtx struct{}
+type CompanyPayloadCtx struct {
+	validator *validator.Validation
+}
 
-func NewCompanyPayloadCtx() *CompanyPayloadCtx {
-	return &CompanyPayloadCtx{}
+func NewCompanyPayloadCtx(v *validator.Validation) *CompanyPayloadCtx {
+	return &CompanyPayloadCtx{validator: v}
 }
 
 func (c *CompanyPayloadCtx) Handle(next http.Handler) http.Handler {
@@ -31,7 +33,7 @@ func (c *CompanyPayloadCtx) Handle(next http.Handler) http.Handler {
 			return
 		}
 
-		if errs := validator.NewValidation().Validate(&data); len(errs) != 0 {
+		if errs := c.validator.Validate(&data); len(errs) != 0 {
 			render.Render(w, r, &handlers.ErrResponse{
 				Message:        "Invalid request data",
 				Errors:         errs.Errors(),
