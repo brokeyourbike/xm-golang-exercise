@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type CompaniesSuite struct {
@@ -35,7 +36,7 @@ func (s *CompaniesSuite) SetupDatabase() {
 		Conn:                      db,
 		SkipInitializeWithVersion: true,
 	}), &gorm.Config{
-		// Logger:                 logger.Default.LogMode(logger.Silent),
+		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: false,
 	})
 	require.NoError(s.T(), err)

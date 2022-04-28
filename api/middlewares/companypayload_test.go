@@ -42,12 +42,12 @@ func TestCompanyPayloadCtx(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 			response:   `{"message":"Invalid request data","errors":["Field validation for 'Code' failed on the 'required' tag"]}`,
 		},
-		"query should be valid": {
+		"query will not accept random filed": {
 			method:     http.MethodGet,
-			path:       "/?name=1234",
+			path:       "/?moon=white",
 			body:       "",
 			statusCode: http.StatusBadRequest,
-			response:   ``,
+			response:   `{"message":"Invalid query params"}`,
 		},
 	}
 
