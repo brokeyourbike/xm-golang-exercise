@@ -36,7 +36,7 @@ func (c *CompanyCtx) Handle(next http.Handler) http.Handler {
 		company, err := c.companiesRepo.Get(uint64(id))
 
 		if errors.Is(err, models.ErrCompanyNotFound) {
-			render.Render(w, r, &handlers.ErrResponse{Message: "Resource not found", HTTPStatusCode: http.StatusNotFound})
+			render.Render(w, r, &handlers.ErrResponse{Message: "Company not found", HTTPStatusCode: http.StatusNotFound})
 			return
 		}
 
