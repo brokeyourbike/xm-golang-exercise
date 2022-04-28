@@ -55,6 +55,7 @@ func (c *companies) HandleCompanyGetOne(w http.ResponseWriter, r *http.Request) 
 }
 
 // HandleCompanyGetAll handles GET requests to return multiple companies.
+// It's possible to filter the companies by passing CompanyPayload names fields as query params.
 func (c *companies) HandleCompanyGetAll(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(CompanyPayloadCtxKey{}).(requests.CompanyPayload)
 
