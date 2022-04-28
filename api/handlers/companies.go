@@ -44,14 +44,14 @@ func (c *companies) HandleCompanyCreate(w http.ResponseWriter, r *http.Request) 
 	render.Render(w, r, &responses.CompanyResponse{Company: &company, HTTPStatusCode: http.StatusCreated})
 }
 
-// HandleCompanyGetOne handles GET requests to view Company
+// HandleCompanyGetOne handles GET requests to display single company
 func (c *companies) HandleCompanyGetOne(w http.ResponseWriter, r *http.Request) {
 	company := r.Context().Value(CompanyCtxKey{}).(models.Company)
 
 	render.Render(w, r, &responses.CompanyResponse{Company: &company, HTTPStatusCode: http.StatusOK})
 }
 
-// HandleCompanyGetAll handles GET requests to view all companies
+// HandleCompanyGetAll handles GET requests to view companies
 func (c *companies) HandleCompanyGetAll(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(CompanyPayloadCtxKey{}).(requests.CompanyPayload)
 
