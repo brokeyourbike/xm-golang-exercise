@@ -39,7 +39,7 @@ func run() error {
 		return fmt.Errorf("cannot connect to DB: %v", err)
 	}
 
-	cache := freecache.NewCache(100 * 1024 * 1024)
+	cache := freecache.NewCache(cfg.CacheSizeMb * 1024 * 1024)
 
 	orm.AutoMigrate(&models.Company{})
 	companiesRepo := db.NewCompaniesRepo(orm)
