@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type CompaniesSuite struct {
@@ -32,7 +33,10 @@ func (s *CompaniesSuite) SetupDatabase() {
 	s.db, err = gorm.Open(mysql.New(mysql.Config{
 		Conn:                      db,
 		SkipInitializeWithVersion: true,
-	}), &gorm.Config{SkipDefaultTransaction: false})
+	}), &gorm.Config{
+		Logger:                 logger.Default.LogMode(logger.Silent),
+		SkipDefaultTransaction: false,
+	})
 	require.NoError(s.T(), err)
 }
 
@@ -50,7 +54,7 @@ func TestUsers(t *testing.T) {
 }
 
 func (s *CompaniesSuite) TestItCanCreateCompany() {
-	user := models.Company{
+	company := models.Company{
 		Name:    "test",
 		Code:    "super-hash",
 		Country: "US",
@@ -60,11 +64,51 @@ func (s *CompaniesSuite) TestItCanCreateCompany() {
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec("INSERT INTO `companies`").
-		WithArgs(user.Name, user.Code, user.Country, user.Website, user.Phone).
+		WithArgs(company.Name, company.Code, company.Country, company.Website, company.Phone).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
 
-	u, err := s.repository.Create(user)
+	c, err := s.repository.Create(company)
 	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), uint64(1), u.ID)
+	assert.Equal(s.T(), uint64(1), c.ID)
+}
+
+func (s *CompaniesSuite) TestItCanGetCompanyById() {
+	company := models.Company{
+		ID:      3,
+		Name:    "test",
+		Code:    "c12",
+		Country: "UA",
+		Website: "test.com",
+		Phone:   "+12345",
+	}
+
+	s.mock.ExpectQuery("SELECT").
+		WithArgs(company.ID).
+		WillReturnRows((sqlmock.NewRows([]string{"id", "name", "code", "country", "website", "phone"})).
+			AddRow("3", "test", "c12", "UA", "test.com", "+12345"))
+
+	res, err := s.repository.Get(company.ID)
+	assert.NoError(s.T(), err)
+	assert.Equal(s.T(), company, res)
+}
+
+func (s *CompaniesSuite) TestItCanReturnErrCompanyNotFound() {
+	s.mock.ExpectQuery("SELECT").
+		WithArgs(10).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	res, err := s.repository.Get(10)
+	assert.ErrorIs(s.T(), err, models.ErrCompanyNotFound)
+	assert.Equal(s.T(), models.Company{}, res)
+}
+
+func (s *CompaniesSuite) TestItCanReturnGeneralError() {
+	s.mock.ExpectQuery("SELECT").
+		WithArgs(10).
+		WillReturnError(gorm.ErrInvalidField)
+
+	res, err := s.repository.Get(10)
+	assert.ErrorIs(s.T(), err, gorm.ErrInvalidField)
+	assert.Equal(s.T(), models.Company{}, res)
 }
