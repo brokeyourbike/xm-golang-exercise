@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/brokeyourbike/xm-golang-exercise/api/requests"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type CompaniesSuite struct {
@@ -35,7 +35,7 @@ func (s *CompaniesSuite) SetupDatabase() {
 		Conn:                      db,
 		SkipInitializeWithVersion: true,
 	}), &gorm.Config{
-		Logger:                 logger.Default.LogMode(logger.Silent),
+		// Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: false,
 	})
 	require.NoError(s.T(), err)
@@ -142,5 +142,17 @@ func (s *CompaniesSuite) TestItCanUpdateCompany() {
 	s.mock.ExpectCommit()
 
 	err := s.repository.Update(company)
+	assert.NoError(s.T(), err)
+}
+
+func (s *CompaniesSuite) TestItCanSearchCompany() {
+	p := requests.CompanyPayload{Website: "https://google.com", Phone: "+12345"}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `companies`")).
+		WithArgs(p.Website, p.Phone).
+		WillReturnRows((sqlmock.NewRows([]string{"id", "name", "code", "country", "website", "phone"})).
+			AddRow("3", "test", "c12", "UA", "test.com", "+12345"))
+
+	_, err := s.repository.GetAll(p)
 	assert.NoError(s.T(), err)
 }

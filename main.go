@@ -16,10 +16,11 @@ import (
 	"github.com/caarlos0/env/v6"
 	"github.com/coocood/freecache"
 	"github.com/go-chi/chi/v5"
-	gorm_logrus "github.com/onrik/gorm-logrus"
+	"github.com/gorilla/schema"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -37,7 +38,8 @@ func run() error {
 		return fmt.Errorf("cannot parse config: %v", err)
 	}
 
-	orm, err := gorm.Open(mysql.Open(cfg.Database.Dsn), &gorm.Config{Logger: gorm_logrus.New()})
+	// Logger: gorm_logrus.New()
+	orm, err := gorm.Open(mysql.Open(cfg.Database.Dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		return fmt.Errorf("cannot connect to DB: %v", err)
 	}
@@ -50,11 +52,11 @@ func run() error {
 
 	c := handlers.NewCompanies(companiesRepo)
 	cmw := middlewares.NewCompanyCtx(companiesRepo)
-	pmw := middlewares.NewCompanyPayloadCtx(validator.NewValidation())
+	pmw := middlewares.NewCompanyPayloadCtx(validator.NewValidation(), schema.NewDecoder())
 	ipmw := middlewares.NewIpapi(&cfg, &httpClient, cache)
 
-	srv := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
-	srv.Handle(&cfg)
+	mux := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
+	http.ListenAndServe(cfg.Host+":"+cfg.Port, mux)
 
 	return nil
 }

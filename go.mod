@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
 	github.com/go-playground/validator/v10 v10.10.1
-	github.com/onrik/gorm-logrus v0.3.0
+	github.com/gorilla/schema v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.1
 	gorm.io/driver/mysql v1.3.3

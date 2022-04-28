@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/brokeyourbike/xm-golang-exercise/api/handlers"
+	"github.com/brokeyourbike/xm-golang-exercise/api/responses"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -29,19 +30,19 @@ func (c *CompanyCtx) Handle(next http.Handler) http.Handler {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 0)
 		if err != nil {
 			log.WithFields(log.Fields{"id": chi.URLParam(r, "id")}).Warn("ID URL param invalid")
-			render.Render(w, r, &handlers.ErrResponse{Message: "Invalid ID", HTTPStatusCode: http.StatusBadRequest})
+			render.Render(w, r, &responses.ErrResponse{Message: "Invalid ID", HTTPStatusCode: http.StatusBadRequest})
 			return
 		}
 
 		company, err := c.companiesRepo.Get(uint64(id))
 
 		if errors.Is(err, models.ErrCompanyNotFound) {
-			render.Render(w, r, &handlers.ErrResponse{Message: "Company not found", HTTPStatusCode: http.StatusNotFound})
+			render.Render(w, r, &responses.ErrResponse{Message: "Company not found", HTTPStatusCode: http.StatusNotFound})
 			return
 		}
 
 		if err != nil {
-			render.Render(w, r, &handlers.ErrResponse{Message: "Cannot query company", HTTPStatusCode: http.StatusInternalServerError})
+			render.Render(w, r, &responses.ErrResponse{Message: "Cannot query company", HTTPStatusCode: http.StatusInternalServerError})
 			return
 		}
 

@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 
+	"github.com/brokeyourbike/xm-golang-exercise/api/requests"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
 	"gorm.io/gorm"
 )
@@ -34,6 +35,17 @@ func (c *CompaniesRepo) Get(id uint64) (models.Company, error) {
 	}
 
 	return company, nil
+}
+
+func (c *CompaniesRepo) GetAll(p requests.CompanyPayload) ([]models.Company, error) {
+	var companies []models.Company
+
+	err := c.db.Where(p.ToCompany()).Find(&companies).Error
+	if err != nil {
+		return companies, err
+	}
+
+	return companies, nil
 }
 
 func (c *CompaniesRepo) Delete(id uint64) error {
