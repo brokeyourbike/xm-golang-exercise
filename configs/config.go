@@ -5,7 +5,7 @@ type Config struct {
 	Host     string `env:"HOST" envDefault:"127.0.0.1"`
 	Port     string `env:"PORT" envDefault:"9090"`
 	Database struct {
-		Dsn string `env:"DATABASE_DSN" envDefault:"username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=True&loc=Local"`
+		Dsn string `env:"DATABASE_DSN" envDefault:"u:p@tcp(127.0.0.1:3306)/db?charset=utf8mb4"`
 	}
 	CacheSizeMb int `env:"CACHE_SIZE_MB" envDefault:"100"`
 	Ipapi       struct {

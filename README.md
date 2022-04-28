@@ -19,7 +19,7 @@ go run main.go
 | ------------- |:-------------:| -----:|
 | `HOST` | application host | `127.0.0.1` |
 | `PORT` | application port |   `9090` |
-| `DATABASE_DSN` | MySQL database DSN (data shource name) | `username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=True&loc=Local` |
+| `DATABASE_DSN` | MySQL database DSN (data shource name) | `u:p@tcp(127.0.0.1:3306)/db?charset=utf8mb4` |
 | `CACHE_SIZE_MB` | applicaiton cache size, in MB | `100` |
 | `IPAPI_BASE_URL` | base URL for the [ipapi.co](https://ipapi.co) service | `https://ipapi.co` |
 | `IPAPI_TTL_SECONDS` | how long to cache information about IP address, in seconds | `10` |
