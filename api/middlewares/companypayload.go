@@ -13,17 +13,19 @@ import (
 	"github.com/gorilla/schema"
 )
 
-// CompanyPayloadCtx is used to validate incoming Company payload data.
-// In case payload is invalid, we return formatted errors.
+// CompanyCtx is a middleware used to validate incoming Company payload data.
 type CompanyPayloadCtx struct {
 	validator    *validator.Validation
 	queryDecoder *schema.Decoder
 }
 
+// NewCompanyPayloadCtx creates an instance of CompanyPayloadCtx middleware.
 func NewCompanyPayloadCtx(v *validator.Validation, queryDecoder *schema.Decoder) *CompanyPayloadCtx {
 	return &CompanyPayloadCtx{validator: v, queryDecoder: queryDecoder}
 }
 
+// Handle is used to validate incoming Company payload data.
+// In case payload is invalid, we return formatted errors.
 func (c *CompanyPayloadCtx) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var data requests.CompanyPayload

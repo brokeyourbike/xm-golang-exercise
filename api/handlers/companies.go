@@ -15,6 +15,7 @@ type CompanyCtxKey struct{}
 // CompanyPayloadCtxKey is a key used for the Company payload object in the context
 type CompanyPayloadCtxKey struct{}
 
+// CompaniesRepo repository defines functions used companies manipulation.
 type CompaniesRepo interface {
 	Create(models.Company) (models.Company, error)
 	GetAll(requests.CompanyPayload) ([]models.Company, error)
@@ -23,15 +24,17 @@ type CompaniesRepo interface {
 	Update(models.Company) error
 }
 
+// companies handler, for getting and updating companies.
 type companies struct {
 	companiesRepo CompaniesRepo
 }
 
+// NewCompanies returns a new companies handler with the given repository.
 func NewCompanies(c CompaniesRepo) *companies {
 	return &companies{companiesRepo: c}
 }
 
-// HandleCompanyCreate handles POST requests to create companies
+// HandleCompanyCreate handles POST requests to create companies.
 func (c *companies) HandleCompanyCreate(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(CompanyPayloadCtxKey{}).(requests.CompanyPayload)
 
@@ -44,14 +47,14 @@ func (c *companies) HandleCompanyCreate(w http.ResponseWriter, r *http.Request) 
 	render.Render(w, r, &responses.CompanyResponse{Company: &company, HTTPStatusCode: http.StatusCreated})
 }
 
-// HandleCompanyGetOne handles GET requests to display single company
+// HandleCompanyGetOne handles GET requests to display single company.
 func (c *companies) HandleCompanyGetOne(w http.ResponseWriter, r *http.Request) {
 	company := r.Context().Value(CompanyCtxKey{}).(models.Company)
 
 	render.Render(w, r, &responses.CompanyResponse{Company: &company, HTTPStatusCode: http.StatusOK})
 }
 
-// HandleCompanyGetAll handles GET requests to view companies
+// HandleCompanyGetAll handles GET requests to return multiple companies.
 func (c *companies) HandleCompanyGetAll(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(CompanyPayloadCtxKey{}).(requests.CompanyPayload)
 
@@ -64,7 +67,7 @@ func (c *companies) HandleCompanyGetAll(w http.ResponseWriter, r *http.Request) 
 	render.Render(w, r, &responses.CompaniesResponse{Companies: companies, HTTPStatusCode: http.StatusOK})
 }
 
-// HandleCompanyUpdate handles PUT requests to update companies
+// HandleCompanyUpdate handles PUT requests to update companies.
 func (c *companies) HandleCompanyUpdate(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(CompanyPayloadCtxKey{}).(requests.CompanyPayload)
 	company := r.Context().Value(CompanyCtxKey{}).(models.Company)
@@ -80,7 +83,7 @@ func (c *companies) HandleCompanyUpdate(w http.ResponseWriter, r *http.Request) 
 	render.Render(w, r, &responses.CompanyResponse{Company: &new, HTTPStatusCode: http.StatusOK})
 }
 
-// HandleCompanyDelete handles DELETE requests to delete companies
+// HandleCompanyDelete handles DELETE requests to delete companies.
 func (c *companies) HandleCompanyDelete(w http.ResponseWriter, r *http.Request) {
 	company := r.Context().Value(CompanyCtxKey{}).(models.Company)
 

@@ -19,7 +19,7 @@ type Cache interface {
 	Set([]byte, []byte, int) error
 }
 
-// Ipapi is a middleware that fetched the country code for request remote address,
+// Ipapi is a middleware that fetches the country code for request IP address,
 // and verifies if it's allowed to proceed.
 type Ipapi struct {
 	config     *configs.Config
@@ -27,10 +27,13 @@ type Ipapi struct {
 	cache      Cache
 }
 
+// NewIpapi creates an instance of Ipapi middleware.
 func NewIpapi(config *configs.Config, httpClient HTTPClient, cache Cache) *Ipapi {
 	return &Ipapi{config: config, httpClient: httpClient, cache: cache}
 }
 
+// Handle used to fetch the country code for request IP address,
+// and verifies if it's allowed to proceed.
 func (i *Ipapi) Handle(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		parts := strings.Split(r.RemoteAddr, ":")
@@ -58,6 +61,8 @@ func (i *Ipapi) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+// getCountryCode handles fetching and storing country code in cache.
+// If cache is empty it will call ipapi service for the result.
 func (i *Ipapi) getCountryCode(ip string) (string, error) {
 	v, err := i.cache.Get([]byte(ip))
 	if err == nil {
@@ -72,6 +77,8 @@ func (i *Ipapi) getCountryCode(ip string) (string, error) {
 	return code, err
 }
 
+// fetchCountryCode performs HTTP request to the ipapi service
+// and returns country code on success.
 func (i *Ipapi) fetchCountryCode(ip string) (string, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/country", i.config.Ipapi.BaseURL, ip), nil)
 	if err != nil {
@@ -100,6 +107,7 @@ func (i *Ipapi) fetchCountryCode(ip string) (string, error) {
 	return string(code), nil
 }
 
+// isCodeAllowed verifies if country code is allowed.
 func (i *Ipapi) isCodeAllowed(code string) bool {
 	for _, c := range i.config.Ipapi.AllowedCountries {
 		if c == code {

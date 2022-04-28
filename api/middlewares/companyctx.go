@@ -14,17 +14,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// CompanyCtx is used to load an Company object from
-// the URL parameters passed through as the request. In case
-// the Company could not be found, we stop here and return a 404.
+// CompanyCtx is a middleware used to load Company to context.
 type CompanyCtx struct {
 	companiesRepo handlers.CompaniesRepo
 }
 
+// NewCompanyCtx creates an instance of CompanyCtx middleware.
 func NewCompanyCtx(r handlers.CompaniesRepo) *CompanyCtx {
 	return &CompanyCtx{companiesRepo: r}
 }
 
+// Handle is used to load an Company object from
+// the URL parameters passed through in the request. In case
+// the Company could not be found, we stop here and return a 404.
 func (c *CompanyCtx) Handle(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 0)

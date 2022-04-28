@@ -11,6 +11,7 @@ type CompanyPayload struct {
 	Phone   string `json:"phone" in:"query=phone" shema:"phone" validate:"required,e164"`
 }
 
+// ToCompany creates a new Company from the CompanyPayload.
 func (c *CompanyPayload) ToCompany() models.Company {
 	return models.Company{
 		Name:    c.Name,

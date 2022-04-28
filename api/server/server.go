@@ -8,18 +8,23 @@ import (
 	"github.com/go-chi/render"
 )
 
+// CompaniesHandler defines a set of handlers required
+// to be used with the server.
 type CompaniesHandler interface {
-	HandleCompanyCreate(w http.ResponseWriter, r *http.Request)
-	HandleCompanyGetOne(w http.ResponseWriter, r *http.Request)
-	HandleCompanyGetAll(w http.ResponseWriter, r *http.Request)
-	HandleCompanyUpdate(w http.ResponseWriter, r *http.Request)
-	HandleCompanyDelete(w http.ResponseWriter, r *http.Request)
+	HandleCompanyCreate(http.ResponseWriter, *http.Request)
+	HandleCompanyGetOne(http.ResponseWriter, *http.Request)
+	HandleCompanyGetAll(http.ResponseWriter, *http.Request)
+	HandleCompanyUpdate(http.ResponseWriter, *http.Request)
+	HandleCompanyDelete(http.ResponseWriter, *http.Request)
 }
 
+// Middleware defines a requirements for the middlewares
+// to be used with the server.
 type Middleware interface {
-	Handle(next http.Handler) http.Handler
+	Handle(http.Handler) http.Handler
 }
 
+// server represents mux.
 type server struct {
 	router    *chi.Mux
 	companies CompaniesHandler
@@ -28,16 +33,19 @@ type server struct {
 	mwIp      Middleware
 }
 
+// NewServer creates a new server with the given router and handlers.
 func NewServer(r *chi.Mux, c CompaniesHandler, mwCompany Middleware, mwPayload Middleware, mwIp Middleware) *server {
 	s := server{router: r, companies: c, mwCompany: mwCompany, mwPayload: mwPayload, mwIp: mwIp}
 	return &s
 }
 
+// ServeHTTP handles serving the routes.
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.routes()
 	s.router.ServeHTTP(w, r)
 }
 
+// routes defines routes and middlewares.
 func (s *server) routes() {
 	s.router.Use(middleware.RealIP)
 	s.router.Use(middleware.Recoverer)

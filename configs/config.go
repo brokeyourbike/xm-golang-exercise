@@ -1,5 +1,6 @@
 package configs
 
+// Config is a single storage of configuration options.
 type Config struct {
 	Host     string `env:"HOST" envDefault:"127.0.0.1"`
 	Port     string `env:"PORT" envDefault:"9090"`

@@ -30,6 +30,7 @@ func (c CompanyResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// CompanyResponse is the response for multiple companies.
 type CompaniesResponse struct {
 	Companies      []models.Company `json:"companies"`
 	HTTPStatusCode int              `json:"-"`

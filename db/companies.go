@@ -12,15 +12,20 @@ type CompaniesRepo struct {
 	db *gorm.DB
 }
 
+// NewCompaniesRepo creates a new instance of the CompaniesRepo.
 func NewCompaniesRepo(db *gorm.DB) *CompaniesRepo {
 	return &CompaniesRepo{db: db}
 }
 
+// Create adds a new company to the database.
 func (c *CompaniesRepo) Create(company models.Company) (models.Company, error) {
 	err := c.db.Create(&company).Error
 	return company, err
 }
 
+// Get returns a single company from the database.
+// If a company with the given id does not exist in the database
+// this function returns a ErrCompanyNotFound error.
 func (c *CompaniesRepo) Get(id uint64) (models.Company, error) {
 	var company models.Company
 
@@ -37,6 +42,7 @@ func (c *CompaniesRepo) Get(id uint64) (models.Company, error) {
 	return company, nil
 }
 
+// GetAll returns all companies from the database.
 func (c *CompaniesRepo) GetAll(p requests.CompanyPayload) ([]models.Company, error) {
 	var companies []models.Company
 
@@ -48,10 +54,12 @@ func (c *CompaniesRepo) GetAll(p requests.CompanyPayload) ([]models.Company, err
 	return companies, nil
 }
 
+// Delete deletes a company from the database.
 func (c *CompaniesRepo) Delete(id uint64) error {
 	return c.db.Delete(&models.Company{ID: id}).Error
 }
 
+// Update updates a company from the database.
 func (c *CompaniesRepo) Update(company models.Company) error {
 	return c.db.Model(&company).Updates(&models.Company{
 		Name:    company.Name,
