@@ -55,7 +55,7 @@ func run() error {
 	ipmw := middlewares.NewIpapi(&cfg, &httpClient, cache)
 
 	mux := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
-	http.ListenAndServe(cfg.Host+":"+cfg.Port, mux)
+	mux.ListenAndServe(&cfg)
 
 	return nil
 }

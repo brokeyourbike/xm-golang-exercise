@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/brokeyourbike/xm-golang-exercise/configs"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -43,6 +44,11 @@ func NewServer(r *chi.Mux, c CompaniesHandler, mwCompany Middleware, mwPayload M
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.routes()
 	s.router.ServeHTTP(w, r)
+}
+
+func (s *server) ListenAndServe(cfg *configs.Config) {
+	s.routes()
+	http.ListenAndServe(cfg.Host+":"+cfg.Port, s.router)
 }
 
 // routes defines routes and middlewares.

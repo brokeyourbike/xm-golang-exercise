@@ -16,7 +16,7 @@ go run main.go
 ## Configuration
 
 | Enviroment Variable | Description | Default  |
-| ------------- |:-------------:| -----:|
+| ------------- |:-------------| :-----|
 | `HOST` | application host | `127.0.0.1` |
 | `PORT` | application port |   `9090` |
 | `DATABASE_DSN` | MySQL database DSN (data shource name) | `u:p@tcp(127.0.0.1:3306)/db?charset=utf8mb4` |
