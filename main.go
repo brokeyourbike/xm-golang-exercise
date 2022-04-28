@@ -11,6 +11,7 @@ import (
 	"github.com/brokeyourbike/xm-golang-exercise/db"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
 	"github.com/caarlos0/env/v6"
+	"github.com/coocood/freecache"
 	"github.com/go-chi/chi/v5"
 	gorm_logrus "github.com/onrik/gorm-logrus"
 	log "github.com/sirupsen/logrus"
@@ -38,13 +39,15 @@ func run() error {
 		return fmt.Errorf("cannot connect to DB: %v", err)
 	}
 
+	cache := freecache.NewCache(100 * 1024 * 1024)
+
 	orm.AutoMigrate(&models.Company{})
 	companiesRepo := db.NewCompaniesRepo(orm)
 
 	c := handlers.NewCompanies(companiesRepo)
 	cmw := middlewares.NewCompanyCtx(companiesRepo)
 	pmw := middlewares.NewCompanyPayloadCtx()
-	ipmw := middlewares.NewIpapi(&cfg)
+	ipmw := middlewares.NewIpapi(&cfg, cache)
 
 	srv := server.NewServer(chi.NewRouter(), c, cmw, pmw, ipmw)
 	srv.Handle(&cfg)

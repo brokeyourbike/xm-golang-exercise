@@ -8,15 +8,17 @@ import (
 	"time"
 
 	"github.com/brokeyourbike/xm-golang-exercise/configs"
+	"github.com/coocood/freecache"
 	log "github.com/sirupsen/logrus"
 )
 
 type Ipapi struct {
 	config *configs.Config
+	cache  *freecache.Cache
 }
 
-func NewIpapi(config *configs.Config) *Ipapi {
-	return &Ipapi{config: config}
+func NewIpapi(config *configs.Config, cache *freecache.Cache) *Ipapi {
+	return &Ipapi{config: config, cache: cache}
 }
 
 // Ipapi is a middleware that logs the start and end of each request.
@@ -29,9 +31,9 @@ func (i *Ipapi) Handle(next http.Handler) http.Handler {
 			return
 		}
 
-		code, err := i.findCountryCode(parts[0])
+		code, err := i.getCountryCode(parts[0])
 		if err != nil {
-			log.WithFields(log.Fields{"ip": parts[0]}).Error("Cannot fetch country for IP")
+			log.WithFields(log.Fields{"ip": parts[0]}).Error("Cannot find country for IP")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -47,8 +49,21 @@ func (i *Ipapi) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// TODO: cache result?
-func (i *Ipapi) findCountryCode(ip string) (string, error) {
+func (i *Ipapi) getCountryCode(ip string) (string, error) {
+	v, err := i.cache.Get([]byte(ip))
+	if err == nil {
+		return string(v), nil
+	}
+
+	code, err := i.fetchCountryCode(ip)
+	if err == nil {
+		i.cache.Set([]byte(ip), []byte(code), int(i.config.Ipapi.TTLSeconds))
+	}
+
+	return code, err
+}
+
+func (i *Ipapi) fetchCountryCode(ip string) (string, error) {
 	c := http.Client{Timeout: time.Second * time.Duration(i.config.Ipapi.TimeoutSeconds)}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/country", i.config.Ipapi.BaseURL, ip), nil)
