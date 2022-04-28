@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/brokeyourbike/xm-golang-exercise/api/requests"
 	"github.com/brokeyourbike/xm-golang-exercise/api/server"
 	"github.com/brokeyourbike/xm-golang-exercise/mocks"
 	"github.com/brokeyourbike/xm-golang-exercise/models"
@@ -50,7 +51,7 @@ func TestCompanies(t *testing.T) {
 			statusCode: http.StatusCreated,
 			response:   `{"id":1,"name":"tes","code":"123","country":"US","website":"example.com","phone":"+1234"}`,
 			setupCtx: func(req *http.Request) context.Context {
-				data := models.Company{Name: "tes", Code: "123", Country: "US", Website: "example.com", Phone: "+1234"}
+				data := requests.CompanyPayload{Name: "tes", Code: "123", Country: "US", Website: "example.com", Phone: "+1234"}
 				return context.WithValue(req.Context(), CompanyPayloadCtxKey{}, data)
 			},
 			setupMock: func(companiesRepo *mocks.CompaniesRepo) {
@@ -64,7 +65,7 @@ func TestCompanies(t *testing.T) {
 			statusCode: http.StatusInternalServerError,
 			response:   `{"message":"Company cannot be created"}`,
 			setupCtx: func(req *http.Request) context.Context {
-				return context.WithValue(req.Context(), CompanyPayloadCtxKey{}, models.Company{})
+				return context.WithValue(req.Context(), CompanyPayloadCtxKey{}, requests.CompanyPayload{})
 			},
 			setupMock: func(companiesRepo *mocks.CompaniesRepo) {
 				companiesRepo.On("Create", mock.AnythingOfType("Company")).Return(models.Company{}, errors.New("cannot create"))
