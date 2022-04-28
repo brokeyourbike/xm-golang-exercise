@@ -4,7 +4,7 @@ type Config struct {
 	Host     string `env:"HOST" envDefault:"127.0.0.1"`
 	Port     string `env:"PORT" envDefault:"9090"`
 	Database struct {
-		Dsn string `env:"DATABASE_DSN" envDefault:"gorm:pa55_worD@tcp(localhost:3306)/xm?charset=utf8&parseTime=True&loc=Local"`
+		Dsn string `env:"DATABASE_DSN" envDefault:"gorm:pa55_worD@tcp(localhost:3306)/xm?charset=utf8mb4&parseTime=True&loc=Local"`
 	}
 	Ipapi struct {
 		BaseURL          string   `env:"IPAPI_BASE_URL" envDefault:"https://ipapi.co"`
