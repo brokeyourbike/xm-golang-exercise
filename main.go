@@ -17,10 +17,10 @@ import (
 	"github.com/coocood/freecache"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/schema"
+	gorm_logrus "github.com/onrik/gorm-logrus"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -38,8 +38,7 @@ func run() error {
 		return fmt.Errorf("cannot parse config: %v", err)
 	}
 
-	// Logger: gorm_logrus.New()
-	orm, err := gorm.Open(mysql.Open(cfg.Database.Dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
+	orm, err := gorm.Open(mysql.Open(cfg.Database.Dsn), &gorm.Config{Logger: gorm_logrus.New()})
 	if err != nil {
 		return fmt.Errorf("cannot connect to DB: %v", err)
 	}
