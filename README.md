@@ -25,3 +25,9 @@ go run main.go
 | `IPAPI_TTL_SECONDS` | how long to cache information about IP address, in seconds | `10` |
 | `IPAPI_TIMEOUT_SECONDS` | HTTP client timeout, in seconds | `10` |
 | `IPAPI_ALLOWED_COUNTRIES` | list of allowed countries (comma separated) | `CY` |
+
+## Authors
+- [Ivan Stasiuk](https://github.com/brokeyourbike) | [Twitter](https://twitter.com/brokeyourbike) | [LinkedIn](https://www.linkedin.com/in/brokeyourbike) | [stasi.uk](https://stasi.uk)
+
+## License
+[MIT License](https://github.com/glocurrency/xm-golang-exercise/blob/main/LICENSE)
